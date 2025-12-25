@@ -145,8 +145,8 @@ const Recommendations = () => {
               Your Personalized <span className="text-gradient">Recommendations</span>
             </h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Based on your investment profile, our AI has analyzed {tadawulStocks.length}+ Tadawul stocks
-              (filtered by your max price per stock) to identify these top opportunities.
+              Based on your investment profile, our AI has analyzed {tadawulStocks.length} Tadawul stocks
+              to identify these top opportunities.
             </p>
           </div>
 
@@ -332,12 +332,12 @@ const Recommendations = () => {
                             variant="outline" 
                             className={cn(
                               "text-xs",
-                              stock.matchScore >= 80 ? "border-green-500 text-green-500" :
-                              stock.matchScore >= 60 ? "border-yellow-500 text-yellow-500" : 
+                              stock.modelPerformance >= 50 ? "border-green-500 text-green-500" :
+                              stock.modelPerformance >= 40 ? "border-yellow-500 text-yellow-500" : 
                               "border-muted text-muted-foreground"
                             )}
                           >
-                            {stock.matchScore}% Profile Match
+                            {stock.modelPerformance}% Model Performance
                           </Badge>
                         </div>
                       </div>
@@ -422,7 +422,7 @@ const Recommendations = () => {
                         <div className="flex items-start gap-3">
                           <Target className="w-5 h-5 text-primary mt-0.5" />
                           <div>
-                            <h4 className="font-semibold text-primary mb-1">Profile Match</h4>
+                            <h4 className="font-semibold text-primary mb-1">Why This Stock</h4>
                             <p className="text-sm text-muted-foreground">
                               {stock.profileFitExplanation}
                             </p>

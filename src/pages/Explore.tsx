@@ -10,7 +10,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 import { Search, Filter, TrendingUp, TrendingDown, ChevronRight, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { tadawulSectors, tadawulStocks, getStocksBySector, Stock, getSectorCount } from '@/data/tadawulStocks';
-import { StockChatbot } from '@/components/chat/StockChatbot';
+
 import { TopMovers } from '@/components/stocks/TopMovers';
 import * as LucideIcons from 'lucide-react';
 
@@ -178,7 +178,7 @@ const Explore = () => {
                   </div>
 
                   <div className="space-y-3">
-                    {filteredStocks.slice(0, 50).map((stock, index) => (
+                    {filteredStocks.map((stock, index) => (
                       <Card 
                         key={stock.ticker}
                         className="glass-card hover:border-primary/30 cursor-pointer transition-all duration-200 animate-fade-in"
@@ -286,7 +286,7 @@ const Explore = () => {
         </SheetContent>
       </Sheet>
 
-      <StockChatbot stockContext={selectedStock} />
+      
     </div>
   );
 };

@@ -9,10 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { ArrowRight, ArrowLeft, Check, DollarSign, Shield, Target, Percent } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, DollarSign, Shield, Target, Percent, Clock } from 'lucide-react';
 import { 
   UserProfile, 
   InvestmentGoal, 
+  TimeHorizon,
   investmentGoals, 
   getRiskLabel, 
   getRiskLevelFromScore,
@@ -29,20 +30,22 @@ const Profile = () => {
   
   // Form state
   const [capital, setCapital] = useState<number>(50000);
-  const [maxPricePerStock, setMaxPricePerStock] = useState<number>(100);
   const [riskTolerance, setRiskTolerance] = useState<number[]>([50]);
   const [investmentGoal, setInvestmentGoal] = useState<InvestmentGoal>('balanced');
+  const [timeHorizon, setTimeHorizon] = useState<TimeHorizon>('medium');
   const [desiredROI, setDesiredROI] = useState<number[]>([10]);
+  const [maxPricePerStock, setMaxPricePerStock] = useState<number>(500);
 
   useEffect(() => {
     // Load existing profile if any
     const existingProfile = loadProfile();
     if (existingProfile) {
       setCapital(existingProfile.capital);
-      setMaxPricePerStock(existingProfile.maxPricePerStock ?? 100);
       setRiskTolerance([existingProfile.riskTolerance]);
       setInvestmentGoal(existingProfile.investmentGoal);
+      setTimeHorizon(existingProfile.timeHorizon || 'medium');
       setDesiredROI([existingProfile.desiredROI]);
+      setMaxPricePerStock(existingProfile.maxPricePerStock || 500);
     }
     
     supabase.auth.onAuthStateChange((event, session) => {
@@ -73,6 +76,7 @@ const Profile = () => {
         riskTolerance: riskTolerance[0],
         riskLevel: getRiskLevelFromScore(riskTolerance[0]),
         investmentGoal,
+        timeHorizon,
         preferredSectors: [], // AI will scan all sectors automatically
         desiredROI: desiredROI[0],
         createdAt: new Date().toISOString(),
@@ -89,15 +93,6 @@ const Profile = () => {
     }
   };
 
-
-  const getROILabel = (value: number) => {
-    if (value <= 5) return 'Conservative (2-5%)';
-    if (value <= 10) return 'Moderate (6-10%)';
-    if (value <= 15) return 'Growth (11-15%)';
-    if (value <= 20) return 'Aggressive (16-20%)';
-    return 'High Risk (20%+)';
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -106,7 +101,7 @@ const Profile = () => {
     );
   }
 
-  const totalSteps = 4;
+  const totalSteps = 5;
 
   return (
     <div className="min-h-screen bg-background">
@@ -116,7 +111,7 @@ const Profile = () => {
         <div className="max-w-2xl mx-auto">
           {/* Progress indicator */}
           <div className="flex items-center justify-center mb-12">
-            {[1, 2, 3, 4].map((step) => (
+            {[1, 2, 3, 4, 5].map((step) => (
               <div key={step} className="flex items-center">
                 <div
                   className={cn(
@@ -170,58 +165,25 @@ const Profile = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <Label htmlFor="maxPrice">Maximum Price per Stock (SAR)</Label>
+                  <Label htmlFor="maxPrice">Maximum Price Per Stock (SAR)</Label>
                   <Input
                     id="maxPrice"
                     type="number"
                     value={maxPricePerStock}
-                    onChange={(e) => setMaxPricePerStock(Math.max(1, Number(e.target.value)))}
-                    className="h-12 text-center bg-input border-border"
-                    min={1}
-                    step={1}
+                    onChange={(e) => setMaxPricePerStock(Number(e.target.value))}
+                    className="text-2xl h-14 text-center bg-input border-border"
+                    min={10}
+                    step={10}
                   />
-                  <div className="flex gap-2 flex-wrap justify-center">
-                    {[25, 50, 100, 200, 500].map((p) => (
-                      <Button
-                        key={p}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setMaxPricePerStock(p)}
-                        className={cn(
-                          "border-border hover:border-primary/50",
-                          maxPricePerStock === p && "border-primary bg-primary/10"
-                        )}
-                      >
-                        SAR {p}
-                      </Button>
-                    ))}
-                  </div>
-                  <p className="text-center text-sm text-muted-foreground">
-                    We will only recommend stocks priced at or below SAR {maxPricePerStock}.
+                  <p className="text-center text-muted-foreground">
+                    Max SAR {maxPricePerStock.toLocaleString()} per share
                   </p>
-                </div>
-
-                <div className="flex gap-2 flex-wrap justify-center">
-                  {[3000, 10000, 50000, 100000, 500000].map((amount) => (
-                    <Button
-                      key={amount}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCapital(amount)}
-                      className={cn(
-                        "border-border hover:border-primary/50",
-                        capital === amount && "border-primary bg-primary/10"
-                      )}
-                    >
-                      SAR {amount >= 1000 ? `${(amount / 1000).toFixed(0)}K` : amount}
-                    </Button>
-                  ))}
                 </div>
 
                 <Button
                   onClick={() => setCurrentStep(2)}
                   className="w-full btn-glow bg-primary text-primary-foreground"
-                  disabled={capital < 1000 || maxPricePerStock <= 0}
+                  disabled={capital < 1000}
                 >
                   Continue
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -313,9 +275,6 @@ const Profile = () => {
                     <span className="text-4xl font-bold text-gradient">
                       {desiredROI[0]}%
                     </span>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {getROILabel(desiredROI[0])}
-                    </p>
                   </div>
                   
                   <Slider
@@ -331,23 +290,6 @@ const Profile = () => {
                     <span>2%</span>
                     <span>30%+</span>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {[5, 10, 15, 20].map((roi) => (
-                    <Button
-                      key={roi}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setDesiredROI([roi])}
-                      className={cn(
-                        "border-border hover:border-primary/50",
-                        desiredROI[0] === roi && "border-primary bg-primary/10"
-                      )}
-                    >
-                      {roi}% Annual
-                    </Button>
-                  ))}
                 </div>
 
                 <div className="p-4 rounded-lg bg-muted/50 border border-border">
@@ -378,8 +320,81 @@ const Profile = () => {
             </Card>
           )}
 
-          {/* Step 4: Investment Goals */}
+          {/* Step 4: Time Horizon */}
           {currentStep === 4 && (
+            <Card className="glass-card animate-fade-in">
+              <CardHeader className="text-center">
+                <div className="mx-auto p-4 rounded-full bg-primary/10 w-fit mb-4">
+                  <Clock className="w-8 h-8 text-primary" />
+                </div>
+                <CardTitle className="text-2xl">Investment Time Horizon</CardTitle>
+                <CardDescription>
+                  How long do you plan to hold your investments?
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  {[
+                    { value: 'short' as const, label: 'Short Term', range: '0 - 6 months', description: 'Quick gains, higher volatility tolerance' },
+                    { value: 'medium' as const, label: 'Medium Term', range: '6 - 24 months', description: 'Balanced approach with moderate growth expectations' },
+                    { value: 'long' as const, label: 'Long Term', range: '24+ months', description: 'Patient investing for sustained growth' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setTimeHorizon(option.value)}
+                      className={cn(
+                        "w-full p-4 rounded-lg border text-left transition-all duration-300",
+                        timeHorizon === option.value
+                          ? "border-primary bg-primary/10 shadow-glow-sm"
+                          : "border-border bg-card hover:border-primary/50"
+                      )}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-semibold text-foreground mb-1">
+                            {option.label}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {option.description}
+                          </div>
+                        </div>
+                        <div className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
+                          {option.range}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="p-4 rounded-lg bg-muted/50 border border-border">
+                  <p className="text-sm text-muted-foreground">
+                    Your time horizon affects stock selection. Longer horizons allow for more growth-oriented picks.
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentStep(3)}
+                    className="flex-1 border-border"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back
+                  </Button>
+                  <Button
+                    onClick={() => setCurrentStep(5)}
+                    className="flex-1 btn-glow bg-primary text-primary-foreground"
+                  >
+                    Continue
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Step 5: Investment Goals */}
+          {currentStep === 5 && (
             <Card className="glass-card animate-fade-in">
               <CardHeader className="text-center">
                 <div className="mx-auto p-4 rounded-full bg-primary/10 w-fit mb-4">
@@ -427,14 +442,14 @@ const Profile = () => {
                     <div>Capital: <span className="text-foreground">SAR {capital.toLocaleString()}</span></div>
                     <div>Risk: <span className="text-foreground">{getRiskLabel(riskTolerance[0])}</span></div>
                     <div>Target ROI: <span className="text-foreground">{desiredROI[0]}%</span></div>
-                    <div>Sectors: <span className="text-foreground">All (Auto-scanned)</span></div>
+                    <div>Time Horizon: <span className="text-foreground">{timeHorizon === 'short' ? 'Short (0-6m)' : timeHorizon === 'medium' ? 'Medium (6-24m)' : 'Long (24+m)'}</span></div>
                   </div>
                 </div>
 
                 <div className="flex gap-3 pt-4">
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentStep(3)}
+                    onClick={() => setCurrentStep(4)}
                     className="flex-1 border-border"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />

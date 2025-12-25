@@ -86,10 +86,10 @@ export const generatePortfolioPDF = (profile: UserProfile, portfolio: PortfolioS
   y += 10;
 
   doc.setFont('helvetica', 'bold');
-  doc.text('Max Price per Stock:', margin + 5, y);
+  doc.text('Time Horizon:', margin + 5, y);
   doc.setFont('helvetica', 'normal');
-  const maxPrice = Number.isFinite(profile.maxPricePerStock) ? profile.maxPricePerStock : null;
-  doc.text(maxPrice ? `SAR ${maxPrice.toLocaleString()}` : 'N/A', margin + 60, y);
+  const horizonLabels: Record<string, string> = { short: 'Short (0-6 months)', medium: 'Medium (6-24 months)', long: 'Long (24+ months)' };
+  doc.text(horizonLabels[profile.timeHorizon] || profile.timeHorizon, margin + 60, y);
   y += 10;
 
   doc.setFont('helvetica', 'bold');
@@ -102,6 +102,12 @@ export const generatePortfolioPDF = (profile: UserProfile, portfolio: PortfolioS
   doc.text('Investment Goal:', margin + 5, y);
   doc.setFont('helvetica', 'normal');
   doc.text(`${goalInfo?.label || profile.investmentGoal}`, margin + 60, y);
+  y += 10;
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Max Per Stock:', margin + 5, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`SAR ${profile.maxPricePerStock?.toLocaleString() || 'No limit'}`, margin + 60, y);
   y += 10;
 
   doc.setFont('helvetica', 'bold');

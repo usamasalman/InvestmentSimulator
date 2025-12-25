@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { AIParticles } from '@/components/ui/AIParticles';
+import { StockAI3DScene } from '@/components/3d/StockAI3DScene';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 export const HeroSection = () => {
@@ -9,8 +11,13 @@ export const HeroSection = () => {
       {/* AI Particles Background */}
       <AIParticles />
       
+      {/* 3D Stock/AI Scene */}
+      <Suspense fallback={null}>
+        <StockAI3DScene />
+      </Suspense>
+      
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/50 to-background pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/50 to-background pointer-events-none z-[1]" />
 
       <div className="container relative z-10 px-4 py-20">
         <div className="max-w-4xl mx-auto text-center">

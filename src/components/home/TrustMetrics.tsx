@@ -85,21 +85,21 @@ export const TrustMetrics = () => {
   const metrics = [
     {
       icon: <Brain className="w-6 h-6" />,
-      value: '94.2%',
-      label: 'AI Accuracy Rate',
-      tooltip: 'Our AI model has achieved a 94.2% accuracy rate in predicting stock movements over the past 12 months based on backtested data.',
+      value: '60%',
+      label: 'Model Performance',
+      tooltip: 'Our AI model has achieved a 60% performance rate in analyzing stock patterns based on backtested data.',
     },
     {
       icon: <TrendingUp className="w-6 h-6" />,
-      value: '200+',
+      value: '262',
       label: 'Stocks Analyzed',
-      tooltip: 'We continuously analyze over 200 stocks listed on the Tadawul Saudi Stock Exchange, covering all major sectors.',
+      tooltip: 'We continuously analyze 262 stocks listed on the Tadawul Saudi Stock Exchange, covering all major sectors.',
     },
     {
       icon: <Users className="w-6 h-6" />,
-      value: '5,000+',
+      value: '100+',
       label: 'Active Investors',
-      tooltip: 'Join our growing community of over 5,000 active investors who trust CoreInvest for their investment decisions.',
+      tooltip: 'Join our growing community of over 100 active investors who trust CoreInvest for their investment decisions.',
     },
     {
       icon: <Shield className="w-6 h-6" />,

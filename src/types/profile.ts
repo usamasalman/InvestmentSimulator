@@ -2,14 +2,15 @@
 
 export type InvestmentGoal = 'capital_preservation' | 'income' | 'balanced' | 'growth' | 'aggressive_growth';
 export type RiskLevel = 'low' | 'medium' | 'high';
+export type TimeHorizon = 'short' | 'medium' | 'long';
 
 export interface UserProfile {
   capital: number;
-  /** Maximum price per stock (SAR) the user is willing to buy */
   maxPricePerStock: number;
   riskTolerance: number; // 0-100
   riskLevel: RiskLevel;
   investmentGoal: InvestmentGoal;
+  timeHorizon: TimeHorizon;
   preferredSectors: string[];
   desiredROI: number; // percentage
   createdAt: string;
@@ -37,6 +38,7 @@ export interface AIRecommendation {
   suggestedShares: number;
   investmentAmount: number;
   expectedReturn: number; // Annual %
+  modelPerformance: number; // 30-60%
   reasoning: string[];
   riskAnalysis: string;
   profileFitExplanation: string;
